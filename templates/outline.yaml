@@ -117,6 +117,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingress.className }}
   {{ if .Values.ingress.tls.enabled }}
   tls:
     - hosts:

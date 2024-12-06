@@ -12,6 +12,7 @@ secretKey: "5974e36f82085f057223565ac2d0d01427a90248ade611108b4b937672649bd4" # 
 utilsSecret: "8c5a14973325ba56694a99856e6be330812b875e5f683dd37022cf76444774bb" # Generate a unique random key. The format is not important but you could still use `openssl rand -hex 32`
 
 ingress:
+  className: nginx
   host: outline.yourdomain.tld
   annotations: # set your custom ingress annotations here
     # cert-manager.io/cluster-issuer: "letsencrypt-staging"
