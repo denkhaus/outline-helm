@@ -19,9 +19,9 @@ env:
 
   # Email configuration (non-sensitive)
   SMTP_FROM_EMAIL: "noreply@example.com"
-
+  URL: http://outline.yourdomain.tld
   # File storage
-  FILE_STORAGE: "s3"  # Using minio S3-compatible storage
+  FILE_STORAGE: "s3" # Using minio S3-compatible storage
   FILE_STORAGE_UPLOAD_MAX_SIZE: "262144000"
 
   # Rate limiting
@@ -36,36 +36,35 @@ env:
 # Required Kubernetes secret containing sensitive values
 # You MUST create this secret before installing the chart
 secrets:
-  name: "outline-secrets"  # Name of your existing Kubernetes secret
-  secretKeyName: "SECRET_KEY"  # Key name in the secret for SECRET_KEY
-  utilsSecretName: "UTILS_SECRET"  # Key name in the secret for UTILS_SECRET
+  name: "outline-secrets" # Name of your existing Kubernetes secret
+  secretKeyName: "SECRET_KEY" # Key name in the secret for SECRET_KEY
+  utilsSecretName: "UTILS_SECRET" # Key name in the secret for UTILS_SECRET
 
   # Authentication secrets (at least one provider required)
-  slackClientSecretName: "SLACK_CLIENT_SECRET"  # Slack OAuth secret
-  googleClientSecretName: "GOOGLE_CLIENT_SECRET"  # Google OAuth secret
-  azureClientSecretName: "AZURE_CLIENT_SECRET"  # Azure/Microsoft secret
-  discordClientSecretName: "DISCORD_CLIENT_SECRET"  # Discord OAuth secret
-  oidcClientSecretName: "OIDC_CLIENT_SECRET"  # Generic OIDC secret
+  slackClientSecretName: "SLACK_CLIENT_SECRET" # Slack OAuth secret
+  googleClientSecretName: "GOOGLE_CLIENT_SECRET" # Google OAuth secret
+  azureClientSecretName: "AZURE_CLIENT_SECRET" # Azure/Microsoft secret
+  discordClientSecretName: "DISCORD_CLIENT_SECRET" # Discord OAuth secret
+  oidcClientSecretName: "OIDC_CLIENT_SECRET" # Generic OIDC secret
 
   # Email secret
-  smtpPasswordName: "SMTP_PASSWORD"  # SMTP password
+  smtpPasswordName: "SMTP_PASSWORD" # SMTP password
 
-  # Redis secret
   redisPasswordName: "REDIS_PASSWORD" # Redis password
 
   # Integration secrets (optional)
-  githubClientSecretName: "GITHUB_CLIENT_SECRET"  # GitHub integration
-  githubWebhookSecretName: "GITHUB_WEBHOOK_SECRET"  # GitHub webhook secret
-  githubAppPrivateKeyName: "GITHUB_APP_PRIVATE_KEY"  # GitHub app private key
-  linearClientSecretName: "LINEAR_CLIENT_SECRET"  # Linear integration
-  notionClientSecretName: "NOTION_CLIENT_SECRET"  # Notion import
-  slackVerificationTokenName: "SLACK_VERIFICATION_TOKEN"  # Slack integration
+  githubClientSecretName: "GITHUB_CLIENT_SECRET" # GitHub integration
+  githubWebhookSecretName: "GITHUB_WEBHOOK_SECRET" # GitHub webhook secret
+  githubAppPrivateKeyName: "GITHUB_APP_PRIVATE_KEY" # GitHub app private key
+  linearClientSecretName: "LINEAR_CLIENT_SECRET" # Linear integration
+  notionClientSecretName: "NOTION_CLIENT_SECRET" # Notion import
+  slackVerificationTokenName: "SLACK_VERIFICATION_TOKEN" # Slack integration
 
 ingress:
   enabled: true
   className: nginx
   host: outline.yourdomain.tld
-  annotations:  # set your custom ingress annotations here
+  annotations: # set your custom ingress annotations here
     # cert-manager.io/cluster-issuer: "letsencrypt-staging"
   tls:
     enabled: false
@@ -96,7 +95,7 @@ postgresql:
   # Option 2: Use existing secret for PostgreSQL credentials
   # Uncomment and configure the following to use existing secret:
   existingSecret: "postgresql-credentials"
-  existingSecretPasswordKey: "postgresql-password"  # Key for "outline"
+  existingSecretPasswordKey: "postgresql-password" # Key for "outline"
   existingSecretPostgresPasswordKey: "postgresql-postgres-password"
 
   persistence:
@@ -115,7 +114,7 @@ minio:
     annotations:
       # cert-manager.io/cluster-issuer: "letsencrypt-staging"
   mode: "standalone"
-  defaultBuckets: "ol-data"  # should not be "outline" because of issue #2068
+  defaultBuckets: "ol-data" # should not be "outline" because of issue #2068
 
   # Option 1: Hardcoded credentials (NOT recommended for production)
   # secretKey:

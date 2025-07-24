@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4] - 2024-07-24
+
+### ✨ Added
+- **External Redis URL Construction**: `REDIS_URL` can now be assembled from `REDIS_HOST` and an optional `REDIS_PASSWORD` from an existing secret, even when the internal Redis is disabled.
+
+### 🔧 Changed
+- **URL Environment Variable Handling**: Ensured `URL` environment variable is set only once, prioritizing user-defined `env.URL` over ingress-derived values.
+
 ## [1.0.0] - 2024-07-24
 
 ### 🚨 BREAKING CHANGES

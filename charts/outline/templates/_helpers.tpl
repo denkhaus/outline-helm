@@ -56,7 +56,10 @@ Core application environment variables
   value: "3000"
 - name: COLLABORATION_URL
   value: ""
-{{- if .Values.ingress.tls.enabled }}
+{{- if .Values.env.URL }}
+- name: URL
+  value: {{ .Values.env.URL | quote }}
+{{- else if .Values.ingress.tls.enabled }}
 - name: URL
   value: "https://{{ .Values.ingress.host }}"
 {{- else }}
@@ -123,6 +126,21 @@ Redis environment variables
 {{- else if .Values.env.REDIS_URL }}
 - name: REDIS_URL
   value: {{ .Values.env.REDIS_URL }}
+{{- else if .Values.env.REDIS_HOST }}
+{{- $redisHost := .Values.env.REDIS_HOST }}
+{{- $redisPort := .Values.env.REDIS_PORT | default "6379" }}
+{{- if .Values.secrets.redisPasswordName }}
+- name: REDIS_URL
+  value: "redis://$(REDIS_PASSWORD)@{{ $redisHost }}:{{ $redisPort }}"
+- name: REDIS_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.secrets.name }}
+      key: {{ .Values.secrets.redisPasswordName }}
+{{- else }}
+- name: REDIS_URL
+  value: "redis://{{ $redisHost }}:{{ $redisPort }}"
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -194,7 +212,7 @@ Excludes sensitive values that must come from secrets
 */}}
 {{- define "outline.additionalEnv" -}}
 {{- range $key, $value := .Values.env }}
-{{- if not (has $key (list "SLACK_CLIENT_SECRET" "GOOGLE_CLIENT_SECRET" "AZURE_CLIENT_SECRET" "DISCORD_CLIENT_SECRET" "OIDC_CLIENT_SECRET" "SMTP_PASSWORD" "SECRET_KEY" "UTILS_SECRET" "GITHUB_CLIENT_SECRET" "LINEAR_CLIENT_SECRET" "NOTION_CLIENT_SECRET" "GITHUB_WEBHOOK_SECRET" "GITHUB_APP_PRIVATE_KEY" "SLACK_VERIFICATION_TOKEN")) }}
+{{- if not (has $key (list "SLACK_CLIENT_SECRET" "GOOGLE_CLIENT_SECRET" "AZURE_CLIENT_SECRET" "DISCORD_CLIENT_SECRET" "OIDC_CLIENT_SECRET" "SMTP_PASSWORD" "SECRET_KEY" "UTILS_SECRET" "GITHUB_CLIENT_SECRET" "LINEAR_CLIENT_SECRET" "NOTION_CLIENT_SECRET" "GITHUB_WEBHOOK_SECRET" "GITHUB_APP_PRIVATE_KEY" "SLACK_VERIFICATION_TOKEN" "URL")) }}
 - name: {{ $key }}
   value: {{ $value | quote }}
 {{- end }}
