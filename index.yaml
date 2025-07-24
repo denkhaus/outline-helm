@@ -3,6 +3,49 @@ entries:
   outline:
   - apiVersion: v2
     appVersion: 0.85.1
+    created: "2025-07-24T17:44:49.715306629Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.3.0
+    - alias: redis
+      condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 20.5.0
+    - alias: minio
+      condition: minio.enabled
+      name: minio
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.8.6
+    description: Secure Helm chart for Outline wiki with mandatory Kubernetes secrets
+    digest: 62081a9bf7f9e7fe147a7b6ff0e8e41a83ba41136ebd3dbbe60c18cf72c7d4ec
+    home: https://github.com/denkhaus/outline-helm
+    icon: https://raw.githubusercontent.com/outline/outline/main/public/images/icon-512.png
+    keywords:
+    - outline
+    - wiki
+    - helm
+    - chart
+    - kubernetes
+    - s3
+    - minio
+    - postgresql
+    - mongodb
+    - knowledge
+    maintainers:
+    - name: denkhaus
+      url: https://github.com/denkhaus
+    name: outline
+    sources:
+    - https://github.com/denkhaus/outline-helm
+    urls:
+    - https://github.com/denkhaus/outline-helm/releases/download/v1.0.3/outline-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
+    appVersion: 0.85.1
     created: "2025-07-24T10:36:17.363666776Z"
     dependencies:
     - alias: postgresql
@@ -130,4 +173,4 @@ entries:
     urls:
     - https://github.com/denkhaus/outline-helm/releases/download/outline-1.0.0/outline-1.0.0.tgz
     version: 1.0.0
-generated: "2025-07-24T10:36:17.363689368Z"
+generated: "2025-07-24T17:44:49.715320885Z"
