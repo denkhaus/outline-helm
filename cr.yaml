@@ -1,0 +1,6 @@
+owner: denkhaus
+git-repo: outline-helm
+charts-dir: charts
+skip-existing: true
+pages-branch: gh-pages
+pages-index-path: index.yaml
