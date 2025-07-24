@@ -90,11 +90,11 @@ postgresql:
   # postgresqlPassword: "vh4rf^q32BcvtFqFVjny4pnM"  # Password for "outline"
   # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password for "postgres"
 
-  # Option 2: Use existing secret for PostgreSQL credentials (RECOMMENDED)
+  # Option 2: Use existing secret for PostgreSQL credentials
   # Uncomment and configure the following to use an existing secret:
   existingSecret: "postgresql-credentials"
-  existingSecretPasswordKey: "postgresql-password"  # Key for "outline" user
-  existingSecretPostgresPasswordKey: "postgresql-postgres-password"  # Key for "postgres"
+  existingSecretPasswordKey: "postgresql-password"  # Key for "outline"
+  existingSecretPostgresPasswordKey: "postgresql-postgres-password"
 
   persistence:
     enabled: true
