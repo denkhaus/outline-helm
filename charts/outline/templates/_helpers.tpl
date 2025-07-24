@@ -89,26 +89,42 @@ Core secret environment variables (REQUIRED from Kubernetes secret)
 Database environment variables
 */}}
 {{- define "outline.databaseEnv" -}}
-{{- if .Values.postgresql.enabled }}
 {{- if .Values.postgresql.existingSecret }}
+{{- if .Values.postgresql.enabled }}
+{{/* Internal PostgreSQL with existing secret */}}
 - name: DATABASE_URL
   value: "postgres://{{ .Values.postgresql.postgresqlUsername}}:$(POSTGRES_PASSWORD)@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}"
 - name: DATABASE_URL_TEST
   value: "postgres://{{ .Values.postgresql.postgresqlUsername }}:$(POSTGRES_PASSWORD)@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}-test"
+{{- else }}
+{{/* External PostgreSQL with existing secret */}}
+- name: DATABASE_URL
+  value: "postgres://{{ .Values.postgresql.postgresqlUsername}}:$(POSTGRES_PASSWORD)@{{ .Values.postgresql.host | default "localhost" }}:{{ .Values.postgresql.port | default 5432 }}/{{ .Values.postgresql.postgresqlDatabase }}"
+- name: DATABASE_URL_TEST
+  value: "postgres://{{ .Values.postgresql.postgresqlUsername }}:$(POSTGRES_PASSWORD)@{{ .Values.postgresql.host | default "localhost" }}:{{ .Values.postgresql.port | default 5432 }}/{{ .Values.postgresql.postgresqlDatabase }}-test"
+{{- end }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.postgresql.existingSecret }}
       key: {{ .Values.postgresql.existingSecretPasswordKey }}
 {{- else }}
+{{- if .Values.postgresql.enabled }}
+{{/* Internal PostgreSQL with hardcoded password */}}
 - name: DATABASE_URL
   value: "postgres://{{ .Values.postgresql.postgresqlUsername}}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}"
 - name: DATABASE_URL_TEST
   value: "postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}-test"
+{{- else }}
+{{/* External PostgreSQL with hardcoded password */}}
+- name: DATABASE_URL
+  value: "postgres://{{ .Values.postgresql.postgresqlUsername}}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Values.postgresql.host | default "localhost" }}:{{ .Values.postgresql.port | default 5432 }}/{{ .Values.postgresql.postgresqlDatabase }}"
+- name: DATABASE_URL_TEST
+  value: "postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Values.postgresql.host | default "localhost" }}:{{ .Values.postgresql.port | default 5432 }}/{{ .Values.postgresql.postgresqlDatabase }}-test"
+{{- end }}
 {{- end }}
 - name: PGSSLMODE
   value: "disable"
-{{- end }}
 {{- end }}
 
 {{/*
