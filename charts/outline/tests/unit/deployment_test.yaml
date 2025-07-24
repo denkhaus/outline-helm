@@ -1,6 +1,6 @@
 suite: test deployment
 templates:
-  - templates/outline.yaml
+  - outline.yaml
 tests:
   - it: should render deployment with default values
     asserts:
@@ -62,6 +62,7 @@ tests:
           content:
             name: DATABASE_URL
             value: "postgres://outline:vh4rf^q32BcvtFqFVjny4pnM@RELEASE-NAME-postgresql:5432/outline"
+        documentIndex: 22
 
   - it: should configure Redis URL when redis is enabled
     set:
@@ -87,6 +88,48 @@ tests:
           content:
             name: AWS_S3_UPLOAD_BUCKET_NAME
             value: "ol-data"
+
+  - it: should configure database URL when postgresql is disabled and external URL is provided
+    set:
+      postgresql.enabled: false
+      env:
+        DATABASE_URL: "postgres://user:password@external-db:5432/mydb"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            value: "postgres://user:password@external-db:5432/mydb"
+
+  - it: should configure Redis URL when redis is disabled and external URL is provided
+    set:
+      redis.enabled: false
+      env:
+        REDIS_URL: "redis://external-redis:6379"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_URL
+            value: "redis://external-redis:6379"
+
+  - it: should configure S3 environment when minio is disabled and external S3 environment is provided
+    set:
+      minio.enabled: false
+      env:
+        AWS_ACCESS_KEY_ID: "external-access-key"
+        AWS_S3_UPLOAD_BUCKET_NAME: "external-bucket"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AWS_ACCESS_KEY_ID
+            value: "external-access-key"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AWS_S3_UPLOAD_BUCKET_NAME
+            value: "external-bucket"
 
   - it: should load auth provider secrets when configured
     set:
@@ -116,7 +159,9 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: SLACK_CLIENT_SECRET
+        documentIndex: 1
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: GOOGLE_CLIENT_SECRET
+        documentIndex: 1

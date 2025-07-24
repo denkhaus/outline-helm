@@ -120,6 +120,9 @@ Redis environment variables
 {{- if .Values.redis.enabled }}
 - name: REDIS_URL
   value: "redis://{{ .Release.Name }}-redis-master:6379"
+{{- else if .Values.env.REDIS_URL }}
+- name: REDIS_URL
+  value: {{ .Values.env.REDIS_URL }}
 {{- end }}
 {{- end }}
 
@@ -160,8 +163,28 @@ S3/Minio environment variables
   value: "26214400"
 - name: AWS_S3_FORCE_PATH_STYLE
   value: "true"
-- name: AWS_S3_ACL
+- name: AWS_3_ACL
   value: "private"
+{{- else if .Values.env.AWS_ACCESS_KEY_ID }}
+- name: AWS_ACCESS_KEY_ID
+  value: {{ .Values.env.AWS_ACCESS_KEY_ID }}
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.secrets.name }}
+      key: {{ .Values.secrets.awsSecretAccessKey }}
+- name: AWS_REGION
+  value: {{ .Values.env.AWS_REGION }}
+- name: AWS_S3_UPLOAD_BUCKET_URL
+  value: {{ .Values.env.AWS_3_UPLOAD_BUCKET_URL }}
+- name: AWS_S3_UPLOAD_BUCKET_NAME
+  value: {{ .Values.env.AWS_S3_UPLOAD_BUCKET_NAME }}
+- name: AWS_S3_UPLOAD_MAX_SIZE
+  value: {{ .Values.env.AWS_3_UPLOAD_MAX_SIZE }}
+- name: AWS_3_FORCE_PATH_STYLE
+  value: {{ .Values.env.AWS_3_FORCE_PATH_STYLE }}
+- name: AWS_3_ACL
+  value: {{ .Values.env.AWS_3_ACL }}
 {{- end }}
 {{- end }}
 

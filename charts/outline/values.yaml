@@ -50,6 +50,9 @@ secrets:
   # Email secret
   smtpPasswordName: "SMTP_PASSWORD"  # SMTP password
 
+  # Redis secret
+  redisPasswordName: "REDIS_PASSWORD" # Redis password
+
   # Integration secrets (optional)
   githubClientSecretName: "GITHUB_CLIENT_SECRET"  # GitHub integration
   githubWebhookSecretName: "GITHUB_WEBHOOK_SECRET"  # GitHub webhook secret

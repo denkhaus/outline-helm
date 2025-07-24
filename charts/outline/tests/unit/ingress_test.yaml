@@ -65,3 +65,14 @@ tests:
           path: spec.ingressClassName
           value: "traefik"
         documentIndex: 2
+
+  - it: should set annotations
+    set:
+      ingress.enabled: true
+      ingress.annotations:
+        foo: bar
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: bar
+        documentIndex: 26
