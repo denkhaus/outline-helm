@@ -1,0 +1,156 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with the Outline Helm chart
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - denkhaus
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible to help us resolve the issue quickly.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight Checklist
+      description: Please confirm you have completed these steps before submitting
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have read the [documentation](https://github.com/denkhaus/outline-helm/blob/main/README.md)
+          required: true
+        - label: I have tried the latest version of the chart
+          required: true
+
+  - type: input
+    id: chart-version
+    attributes:
+      label: Chart Version
+      description: What version of the Outline Helm chart are you using?
+      placeholder: "e.g., 1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: outline-version
+    attributes:
+      label: Outline Version
+      description: What version of Outline is being deployed?
+      placeholder: "e.g., 0.85.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kubernetes-version
+    attributes:
+      label: Kubernetes Version
+      description: What version of Kubernetes are you running?
+      options:
+        - "1.31.x"
+        - "1.30.x"
+        - "1.29.x"
+        - "1.28.x"
+        - "1.27.x"
+        - "1.26.x"
+        - "1.25.x"
+        - "Other (please specify in description)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: helm-version
+    attributes:
+      label: Helm Version
+      description: What version of Helm are you using?
+      options:
+        - "3.16.x"
+        - "3.15.x"
+        - "3.14.x"
+        - "3.13.x"
+        - "3.12.x"
+        - "Other (please specify in description)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug or issue you encountered
+      placeholder: "A clear and concise description of what the bug is..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "A clear and concise description of what you expected to happen..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Install chart with command: `helm install ...`
+        2. Configure values: `...`
+        3. Run command: `...`
+        4. See error: `...`
+    validations:
+      required: true
+
+  - type: textarea
+    id: values-config
+    attributes:
+      label: Values Configuration
+      description: Please share your values.yaml configuration (remove sensitive data)
+      render: yaml
+      placeholder: |
+        # Your values.yaml configuration
+        ingress:
+          enabled: true
+          host: example.com
+        # ... (remove secrets and sensitive data)
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: Error Logs
+      description: Please provide relevant error logs
+      render: shell
+      placeholder: |
+        # Helm command output
+        $ helm install outline outline-helm/outline
+        Error: ...
+
+        # Pod logs
+        $ kubectl logs -l app=outline
+        Error: ...
+
+        # Events
+        $ kubectl get events --sort-by=.metadata.creationTimestamp
+        Warning: ...
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Additional environment information
+      placeholder: |
+        - Cloud Provider: (AWS/GCP/Azure/On-premises)
+        - Ingress Controller: (nginx/traefik/istio/etc.)
+        - Storage Class: (gp2/standard/etc.)
+        - Authentication Provider: (Slack/Google/Azure/etc.)
+        - External Dependencies: (External PostgreSQL/Redis/S3)
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: "Screenshots, related issues, workarounds tried, etc."

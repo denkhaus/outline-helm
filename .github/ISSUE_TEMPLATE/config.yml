@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/denkhaus/outline-helm/discussions
+    about: Ask questions, share ideas, and discuss with the community
+  - name: 🔒 Security Issue
+    url: https://github.com/denkhaus/outline-helm/security/advisories/new
+    about: Report security vulnerabilities privately
+  - name: 📖 Outline Documentation
+    url: https://docs.getoutline.com/
+    about: Official Outline wiki documentation
+  - name: 🐛 Outline Issues
+    url: https://github.com/outline/outline/issues
+    about: Report issues with Outline itself (not the Helm chart)

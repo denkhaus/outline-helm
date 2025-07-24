@@ -42,13 +42,13 @@ deps: ## Update Helm dependencies
 	@echo "$(GREEN)Dependencies updated successfully!$(NC)"
 
 .PHONY: lint
-lint: ## Lint the Helm chart
+lint: deps ## Lint the Helm chart
 	@echo "$(YELLOW)Linting Helm chart...$(NC)"
 	cd $(CHART_DIR) && helm lint .
 	@echo "$(GREEN)Linting completed!$(NC)"
 
 .PHONY: template
-template: ## Generate and validate templates
+template: deps ## Generate and validate templates
 	@echo "$(YELLOW)Validating Helm templates...$(NC)"
 	cd $(CHART_DIR) && helm template $(RELEASE_NAME) . --dry-run > /dev/null
 	@echo "$(GREEN)Template validation passed!$(NC)"

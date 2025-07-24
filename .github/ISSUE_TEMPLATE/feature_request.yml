@@ -1,0 +1,137 @@
+name: 🚀 Feature Request
+description: Suggest a new feature or enhancement for the Outline Helm chart
+title: "[Feature]: "
+labels: ["enhancement", "feature-request"]
+assignees:
+  - denkhaus
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight Checklist
+      description: Please confirm you have completed these steps before submitting
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have read the [documentation](https://github.com/denkhaus/outline-helm/blob/main/README.md)
+          required: true
+        - label: This feature would benefit the broader community, not just my specific use case
+          required: true
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature Type
+      description: What type of feature are you requesting?
+      options:
+        - "New configuration option"
+        - "New authentication provider support"
+        - "New deployment scenario"
+        - "Improved security feature"
+        - "Better documentation"
+        - "Development/testing improvement"
+        - "Performance enhancement"
+        - "Integration with external service"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: What problem does this feature solve?
+      placeholder: "Describe the problem or limitation you're facing..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed solution in detail
+      placeholder: |
+        A clear and concise description of what you want to happen.
+        
+        For example:
+        - Add a new values.yaml option: `feature.enabled: true`
+        - Support for new authentication provider: Discord OAuth
+        - Integration with external monitoring system
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe your specific use case and how this feature would help
+      placeholder: |
+        Explain how you would use this feature:
+        - What is your deployment scenario?
+        - How would this improve your workflow?
+        - What benefits would this provide?
+
+  - type: textarea
+    id: example-config
+    attributes:
+      label: Example Configuration
+      description: If applicable, provide an example of how this feature would be configured
+      render: yaml
+      placeholder: |
+        # Example values.yaml configuration
+        newFeature:
+          enabled: true
+          provider: "example"
+          settings:
+            option1: "value1"
+            option2: "value2"
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternatives have you considered?
+      placeholder: |
+        - Alternative solution 1: ...
+        - Alternative solution 2: ...
+        - Workarounds currently using: ...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - "Low - Nice to have"
+        - "Medium - Would improve my workflow"
+        - "High - Blocking my use case"
+        - "Critical - Required for production deployment"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: implementation
+    attributes:
+      label: Implementation
+      description: Are you willing to help implement this feature?
+      options:
+        - label: I would be willing to submit a pull request for this feature
+        - label: I can help with testing this feature
+        - label: I can help with documentation for this feature
+        - label: I can provide feedback during development
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples about the feature request
+      placeholder: |
+        - Links to relevant documentation
+        - Screenshots or mockups
+        - Related issues or discussions
+        - Examples from other projects

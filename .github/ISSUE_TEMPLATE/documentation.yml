@@ -1,0 +1,92 @@
+name: 📚 Documentation Issue
+description: Report an issue with documentation or request documentation improvements
+title: "[Docs]: "
+labels: ["documentation", "triage"]
+assignees:
+  - denkhaus
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation! Clear documentation is essential for a great user experience.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight Checklist
+      description: Please confirm you have completed these steps before submitting
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have checked the latest documentation on the main branch
+          required: true
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation issue is this?
+      options:
+        - "Missing documentation"
+        - "Incorrect/outdated information"
+        - "Unclear instructions"
+        - "Broken links"
+        - "Typo/grammar issue"
+        - "Example needed"
+        - "Better organization needed"
+        - "Translation issue"
+    validations:
+      required: true
+
+  - type: input
+    id: doc-location
+    attributes:
+      label: Documentation Location
+      description: Where is the documentation issue located?
+      placeholder: "e.g., README.md, charts/outline/examples/README.md, TESTING.md"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe the documentation issue in detail
+      placeholder: |
+        What is wrong with the current documentation?
+        - What information is missing?
+        - What is incorrect or unclear?
+        - What would make it better?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: How would you improve this documentation?
+      placeholder: |
+        Provide specific suggestions for improvement:
+        - What should be added?
+        - How should it be reorganized?
+        - What examples would be helpful?
+
+  - type: textarea
+    id: user-impact
+    attributes:
+      label: User Impact
+      description: How does this documentation issue affect users?
+      placeholder: |
+        - Who is affected by this issue?
+        - What problems does it cause?
+        - How does it impact the user experience?
+
+  - type: checkboxes
+    id: help-offer
+    attributes:
+      label: Contribution
+      description: Are you willing to help improve this documentation?
+      options:
+        - label: I would be willing to submit a pull request to fix this
+        - label: I can help review proposed changes
+        - label: I can provide additional examples or use cases
