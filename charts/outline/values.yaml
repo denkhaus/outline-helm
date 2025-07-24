@@ -91,7 +91,7 @@ postgresql:
   # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password for "postgres"
 
   # Option 2: Use existing secret for PostgreSQL credentials
-  # Uncomment and configure the following to use an existing secret:
+  # Uncomment and configure the following to use existing secret:
   existingSecret: "postgresql-credentials"
   existingSecretPasswordKey: "postgresql-password"  # Key for "outline"
   existingSecretPostgresPasswordKey: "postgresql-postgres-password"
