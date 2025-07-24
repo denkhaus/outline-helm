@@ -1,0 +1,29 @@
+---
+# Test values for chart-testing (CI)
+# This file provides test secrets for the chart installation test
+
+# Use hardcoded credentials for testing (not for production!)
+postgresql:
+  enabled: true
+  # Use hardcoded passwords for CI testing
+  postgresqlPassword: "test-password-123"
+  postgresqlPostgresPassword: "test-postgres-password-456"
+  # Comment out existing secret for testing
+  # existingSecret: "postgresql-credentials"
+  # existingSecretPasswordKey: "postgresql-password"
+  # existingSecretPostgresPasswordKey: "postgresql-postgres-password"
+
+minio:
+  enabled: true
+  # Use hardcoded credentials for CI testing
+  accessKey:
+    password: "test-access-key-123"
+  secretKey:
+    password: "test-secret-key-456"
+  # Comment out existing secret for testing
+  # existingSecret: "minio-credentials"
+  # existingSecretAccessKeyKey: "access-key"
+  # existingSecretSecretKeyKey: "secret-key"
+
+# For the main outline secrets, we'll need to create a test secret
+# This will be handled by the chart-testing workflow
