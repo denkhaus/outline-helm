@@ -3,10 +3,9 @@ name: outline
 description: The outline helm chart to deploy outline in kubernetes clusters.
 version: 0.0.9
 appVersion: 0.69.1
-home: https://encircle360.com
+home: https://github.com/denkhaus/outline-helm
 sources:
-  - https://gitlab.com/encircle360-oss/helm-charts/outline
-  - https://github.com/encircle360-oss/outline-helm-chart
+  - https://github.com/denkhaus/outline-helm
 keywords:
   - outline
   - wiki
@@ -19,6 +18,5 @@ keywords:
   - mongodb
   - knowledge
 maintainers:
-  - name: encircle360 GmbH
-    email: hello@encircle360.com
-    url: https://encircle360.com
+  - name: denkhaus
+    url: https://github.com/denkhaus
