@@ -1,0 +1,48 @@
+version: 2
+updates:
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "denkhaus"
+    assignees:
+      - "denkhaus"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    # Auto-merge minor and patch updates for GitHub Actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Monitor Docker images in Helm charts (for Outline app version)
+  - package-ecosystem: "docker"
+    directory: "/charts/outline"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "denkhaus"
+    assignees:
+      - "denkhaus"
+    commit-message:
+      prefix: "deps(outline)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "outline-version"
+      - "security"

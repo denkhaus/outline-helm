@@ -1,0 +1,95 @@
+# Staging Values for Outline Helm Chart
+# =====================================
+# Copy this file to staging-values.yaml and customize for your staging environment
+
+# Ingress configuration for staging
+ingress:
+  enabled: true
+  className: nginx
+  host: staging-outline.company.com
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"  # Allow HTTP for staging
+  tls:
+    enabled: true
+
+# Staging secrets configuration
+secrets:
+  name: "outline-staging-secrets"
+
+# Environment configuration for staging
+env:
+  # Authentication
+  SLACK_CLIENT_ID: "your-staging-slack-client-id"
+  
+  # Email configuration
+  SMTP_USERNAME: "staging-outline@company.com"
+  SMTP_FROM_EMAIL: "staging-outline@company.com"
+  
+  # Staging settings
+  LOG_LEVEL: "debug"  # More verbose logging for staging
+  RATE_LIMITER_ENABLED: "false"  # Disable for testing
+  ENABLE_UPDATES: "true"
+
+# Smaller resources for staging
+postgresql:
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: 5Gi
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+redis:
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: 2Gi
+  
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+minio:
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: 10Gi
+  
+  ingress:
+    enabled: true
+    hostname: "staging-outline-storage.company.com"
+    certManager: true
+    tls: true
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Single replica for staging
+replicas: 1
+
+# Staging application resources
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi

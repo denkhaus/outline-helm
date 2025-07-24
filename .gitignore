@@ -1,0 +1,20 @@
+# Helm dependency charts
+charts/*/charts/*.tgz
+charts/*/Chart.lock
+
+# Temporary files
+tmp_rovodev_*
+tmp_code_*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

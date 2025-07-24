@@ -1,0 +1,67 @@
+suite: test ingress
+templates:
+  - templates/outline.yaml
+tests:
+  - it: should render ingress when enabled
+    set:
+      ingress.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 3  # Deployment, Service, Ingress
+      - isKind:
+          of: Ingress
+        documentIndex: 2
+      - equal:
+          path: metadata.name
+          value: outline
+        documentIndex: 2
+      - equal:
+          path: spec.rules[0].host
+          value: outline.yourdomain.tld
+        documentIndex: 2
+
+  - it: should not render ingress when disabled
+    set:
+      ingress.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 2  # Only Deployment and Service
+      - isKind:
+          of: Deployment
+        documentIndex: 0
+      - isKind:
+          of: Service
+        documentIndex: 1
+
+  - it: should configure TLS when enabled
+    set:
+      ingress.enabled: true
+      ingress.tls.enabled: true
+    asserts:
+      - isNotEmpty:
+          path: spec.tls
+        documentIndex: 2
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: outline.yourdomain.tld
+        documentIndex: 2
+
+  - it: should set custom host
+    set:
+      ingress.enabled: true
+      ingress.host: "custom.example.com"
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: "custom.example.com"
+        documentIndex: 2
+
+  - it: should set ingress class
+    set:
+      ingress.enabled: true
+      ingress.className: "traefik"
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: "traefik"
+        documentIndex: 2

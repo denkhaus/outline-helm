@@ -1,0 +1,222 @@
+# Ingress Configuration Examples for Outline Helm Chart
+
+# =============================================================================
+# Example 1: Basic Ingress with HTTP
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-basic-ingress
+data:
+  values.yaml: |
+    ingress:
+      enabled: true
+      className: nginx
+      host: outline.example.com
+      tls:
+        enabled: false
+    
+    secrets:
+      name: "outline-secrets"
+
+---
+
+# =============================================================================
+# Example 2: Production Ingress with TLS and cert-manager
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-production-ingress
+data:
+  values.yaml: |
+    ingress:
+      enabled: true
+      className: nginx
+      host: outline.company.com
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      tls:
+        enabled: true
+    
+    secrets:
+      name: "outline-secrets"
+
+---
+
+# =============================================================================
+# Example 3: Traefik Ingress with TLS
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-traefik-ingress
+data:
+  values.yaml: |
+    ingress:
+      enabled: true
+      className: traefik
+      host: outline.example.com
+      annotations:
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: "letsencrypt"
+      tls:
+        enabled: true
+    
+    secrets:
+      name: "outline-secrets"
+
+---
+
+# =============================================================================
+# Example 4: No Ingress (LoadBalancer Service)
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-no-ingress
+data:
+  values.yaml: |
+    ingress:
+      enabled: false
+    
+    # Service will be ClusterIP by default
+    # You can expose it via LoadBalancer or NodePort
+    service:
+      type: LoadBalancer
+      # type: NodePort
+      # nodePort: 30080
+    
+    secrets:
+      name: "outline-secrets"
+
+---
+
+# =============================================================================
+# Example 5: Custom Domain with Path-based Routing
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-path-based
+data:
+  values.yaml: |
+    ingress:
+      enabled: true
+      className: nginx
+      host: company.com
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/use-regex: "true"
+      path: /wiki(/|$)(.*)
+      pathType: Prefix
+      tls:
+        enabled: true
+    
+    secrets:
+      name: "outline-secrets"
+
+---
+
+# =============================================================================
+# Example 6: Multiple Hosts/Aliases
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-multiple-hosts
+data:
+  values.yaml: |
+    ingress:
+      enabled: true
+      className: nginx
+      host: outline.company.com
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      tls:
+        enabled: true
+        # Additional hosts can be added via annotations
+        # or by creating additional Ingress resources
+    
+    secrets:
+      name: "outline-secrets"
+
+---
+
+# =============================================================================
+# Example 7: Development with Local Domain
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: outline-values-development
+data:
+  values.yaml: |
+    ingress:
+      enabled: true
+      className: nginx
+      host: outline.dev.local
+      annotations:
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      tls:
+        enabled: false
+    
+    secrets:
+      name: "outline-dev-secrets"
+    
+    # Smaller resources for development
+    postgresql:
+      persistence:
+        size: 1Gi
+    
+    redis:
+      persistence:
+        size: 1Gi
+    
+    minio:
+      persistence:
+        size: 5Gi
+
+---
+
+# =============================================================================
+# Usage Instructions
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-usage-instructions
+data:
+  README.md: |
+    # How to Use These Ingress Examples
+    
+    ## 1. Choose an Example
+    Pick the ConfigMap that matches your needs from the examples above.
+    
+    ## 2. Extract the Values
+    ```bash
+    kubectl get configmap outline-values-production-ingress -o jsonpath='{.data.values\.yaml}' > my-values.yaml
+    ```
+    
+    ## 3. Create Required Secret
+    ```bash
+    kubectl create secret generic outline-secrets \
+      --from-literal=SECRET_KEY="$(openssl rand -hex 32)" \
+      --from-literal=UTILS_SECRET="$(openssl rand -hex 32)" \
+      --from-literal=SLACK_KEY="your-slack-key" \
+      --from-literal=SLACK_SECRET="your-slack-secret" \
+      --from-literal=SMTP_PASSWORD="your-smtp-password"
+    ```
+    
+    ## 4. Install Outline
+    ```bash
+    helm install outline outline-helm/outline -f my-values.yaml
+    ```
+    
+    ## 5. Verify Ingress
+    ```bash
+    kubectl get ingress
+    kubectl describe ingress outline
+    ```

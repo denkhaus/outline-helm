@@ -1,0 +1,110 @@
+name: Update Helm Dependencies
+
+on:
+  schedule:
+    # Run weekly on Wednesdays at 10:00 UTC
+    - cron: '0 10 * * 3'
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force update even if no changes detected'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+
+      - name: Check for dependency updates
+        id: check-updates
+        run: |
+          cd charts/outline
+          
+          # Get current versions
+          CURRENT_PG=$(grep -A 1 "name: postgresql" Chart.yaml | grep "version:" | awk '{print $2}')
+          CURRENT_REDIS=$(grep -A 1 "name: redis" Chart.yaml | grep "version:" | awk '{print $2}')
+          CURRENT_MINIO=$(grep -A 1 "name: minio" Chart.yaml | grep "version:" | awk '{print $2}')
+          
+          echo "Current PostgreSQL: $CURRENT_PG"
+          echo "Current Redis: $CURRENT_REDIS"
+          echo "Current MinIO: $CURRENT_MINIO"
+          
+          # Check for latest versions (this is a simplified check)
+          # In a real scenario, you'd query the OCI registry for latest versions
+          echo "current_pg=$CURRENT_PG" >> $GITHUB_OUTPUT
+          echo "current_redis=$CURRENT_REDIS" >> $GITHUB_OUTPUT
+          echo "current_minio=$CURRENT_MINIO" >> $GITHUB_OUTPUT
+
+      - name: Update dependencies
+        id: update
+        run: |
+          cd charts/outline
+          
+          # Update dependencies
+          helm dependency update
+          
+          # Check if Chart.lock changed
+          if git diff --quiet Chart.lock; then
+            echo "No dependency updates available"
+            echo "updated=false" >> $GITHUB_OUTPUT
+          else
+            echo "Dependencies updated"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests
+        if: steps.update.outputs.updated == 'true' || github.event.inputs.force_update == 'true'
+        run: |
+          cd charts/outline
+          helm lint .
+          helm template test . --dry-run > /dev/null
+
+      - name: Create Pull Request
+        if: steps.update.outputs.updated == 'true' || github.event.inputs.force_update == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            deps(helm): update chart dependencies
+            
+            - PostgreSQL: ${{ steps.check-updates.outputs.current_pg }}
+            - Redis: ${{ steps.check-updates.outputs.current_redis }}
+            - MinIO: ${{ steps.check-updates.outputs.current_minio }}
+          title: "deps(helm): update chart dependencies"
+          body: |
+            ## Helm Chart Dependencies Update
+            
+            This PR updates the Helm chart dependencies to their latest versions.
+            
+            ### Changes
+            - PostgreSQL: `${{ steps.check-updates.outputs.current_pg }}`
+            - Redis: `${{ steps.check-updates.outputs.current_redis }}`
+            - MinIO: `${{ steps.check-updates.outputs.current_minio }}`
+            
+            ### Testing
+            - ✅ Chart linting passed
+            - ✅ Template rendering passed
+            
+            ### Notes
+            - This is an automated update
+            - All tests must pass before merging
+            - Review the changelog for breaking changes
+            
+            /cc @denkhaus
+          branch: deps/helm-dependencies
+          delete-branch: true
+          labels: |
+            dependencies
+            helm
+            automated

@@ -1,0 +1,99 @@
+name: Test Helm Chart
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'charts/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'charts/**' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+
+      - name: Install helm unittest plugin
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest
+
+      - name: Run chart tests
+        run: |
+          cd charts/outline
+          chmod +x test.sh
+          ./test.sh
+
+      - name: Test chart with different configurations
+        run: |
+          cd charts/outline
+          
+          echo "Testing production configuration..."
+          helm template test . \
+            --set ingress.enabled=true \
+            --set ingress.tls.enabled=true \
+            --set env.SLACK_CLIENT_ID=test \
+            --set env.GOOGLE_CLIENT_ID=test \
+            --dry-run > /dev/null
+          
+          echo "Testing minimal configuration..."
+          helm template test . \
+            --set ingress.enabled=false \
+            --set postgresql.enabled=false \
+            --set redis.enabled=false \
+            --set minio.enabled=false \
+            --dry-run > /dev/null
+          
+          echo "Testing with existing secrets..."
+          helm template test . \
+            --set postgresql.existingSecret=postgresql-creds \
+            --set minio.existingSecret=minio-creds \
+            --dry-run > /dev/null
+
+      - name: Verify secret management
+        run: |
+          cd charts/outline
+          
+          # Test that sensitive values are not in plain text
+          if helm template test . --dry-run | grep -q "vh4rf^q32BcvtFqFVjny4pnM"; then
+            echo "❌ Found hardcoded PostgreSQL password in template output"
+            exit 1
+          fi
+          
+          # Test that secrets are properly referenced
+          if ! helm template test . --set env.SLACK_CLIENT_ID=test --dry-run | grep -q "SLACK_CLIENT_SECRET"; then
+            echo "❌ SLACK_CLIENT_SECRET not found when SLACK_CLIENT_ID is set"
+            exit 1
+          fi
+          
+          echo "✅ Secret management verification passed"
+
+      - name: Test Outline v0.85.1 compatibility
+        run: |
+          cd charts/outline
+          
+          # Verify correct image version
+          if ! helm template test . --dry-run | grep -q "outlinewiki/outline:0.85.1"; then
+            echo "❌ Incorrect Outline version in template"
+            exit 1
+          fi
+          
+          # Verify new environment variables are present
+          template_output=$(helm template test . --dry-run)
+          
+          required_vars=("DEFAULT_LANGUAGE" "FILE_STORAGE" "RATE_LIMITER_ENABLED" "LOG_LEVEL")
+          for var in "${required_vars[@]}"; do
+            if ! echo "$template_output" | grep -q "$var"; then
+              echo "❌ Required environment variable $var not found"
+              exit 1
+            fi
+          done
+          
+          echo "✅ Outline v0.85.1 compatibility verified"

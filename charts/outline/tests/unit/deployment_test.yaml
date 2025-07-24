@@ -1,0 +1,122 @@
+suite: test deployment
+templates:
+  - templates/outline.yaml
+tests:
+  - it: should render deployment with default values
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.name
+          value: outline
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: outlinewiki/outline:0.85.1
+
+  - it: should set environment variables correctly
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PORT
+            value: "3000"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DEFAULT_LANGUAGE
+            value: "en_US"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FILE_STORAGE
+            value: "s3"
+
+  - it: should load secrets from Kubernetes secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: SECRET_KEY
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: UTILS_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: UTILS_SECRET
+
+  - it: should configure database URL when postgresql is enabled
+    set:
+      postgresql.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            value: "postgres://outline:vh4rf^q32BcvtFqFVjny4pnM@RELEASE-NAME-postgresql:5432/outline"
+
+  - it: should configure Redis URL when redis is enabled
+    set:
+      redis.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_URL
+            value: "redis://RELEASE-NAME-redis-master:6379"
+
+  - it: should configure S3 environment when minio is enabled
+    set:
+      minio.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AWS_ACCESS_KEY_ID
+            value: "zFPVNNK*QNp3^V4J38Gy76SehG"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AWS_S3_UPLOAD_BUCKET_NAME
+            value: "ol-data"
+
+  - it: should load auth provider secrets when configured
+    set:
+      env.SLACK_CLIENT_ID: "test-slack-id"
+      env.GOOGLE_CLIENT_ID: "test-google-id"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SLACK_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: SLACK_CLIENT_SECRET
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOOGLE_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: GOOGLE_CLIENT_SECRET
+
+  - it: should not load auth secrets when providers not configured
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SLACK_CLIENT_SECRET
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOOGLE_CLIENT_SECRET

@@ -1,0 +1,17 @@
+# Global ownership
+* @denkhaus
+
+# Helm chart specific
+charts/ @denkhaus
+charts/outline/ @denkhaus
+
+# GitHub workflows and configuration
+.github/ @denkhaus
+
+# Documentation
+*.md @denkhaus
+docs/ @denkhaus
+
+# Security and dependency files
+.github/dependabot.yml @denkhaus
+.github/workflows/ @denkhaus

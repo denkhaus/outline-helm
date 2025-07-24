@@ -44,6 +44,20 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         uses: helm/kind-action@v1.10.0
 
+      - name: Install helm unittest plugin
+        if: steps.list-changed.outputs.changed == 'true'
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest
+
+      - name: Run chart unit tests
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          for chart in charts/*/; do
+            if [ -d "$chart/tests" ]; then
+              echo "Running tests for $chart"
+              helm unittest "$chart"
+            fi
+          done
+
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }}

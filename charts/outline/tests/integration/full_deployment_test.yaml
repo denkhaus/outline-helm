@@ -1,0 +1,111 @@
+suite: test full deployment
+templates:
+  - templates/outline.yaml
+tests:
+  - it: should deploy complete stack with all components
+    set:
+      postgresql.enabled: true
+      redis.enabled: true
+      minio.enabled: true
+      ingress.enabled: true
+      env.SLACK_CLIENT_ID: "test-slack-id"
+      env.SMTP_USERNAME: "test@example.com"
+    asserts:
+      # Should have Deployment, Service, and Ingress
+      - hasDocuments:
+          count: 3
+      
+      # Deployment should be configured correctly
+      - isKind:
+          of: Deployment
+        documentIndex: 0
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: outlinewiki/outline:0.85.1
+        documentIndex: 0
+      
+      # Should have all required environment variables
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            value: "postgres://outline:vh4rf^q32BcvtFqFVjny4pnM@RELEASE-NAME-postgresql:5432/outline"
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_URL
+            value: "redis://RELEASE-NAME-redis-master:6379"
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AWS_S3_UPLOAD_BUCKET_NAME
+            value: "ol-data"
+        documentIndex: 0
+      
+      # Should load secrets correctly
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SLACK_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: SLACK_CLIENT_SECRET
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SMTP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: SMTP_PASSWORD
+        documentIndex: 0
+      
+      # Service should be configured
+      - isKind:
+          of: Service
+        documentIndex: 1
+      - equal:
+          path: spec.ports[0].port
+          value: 80
+        documentIndex: 1
+      
+      # Ingress should be configured
+      - isKind:
+          of: Ingress
+        documentIndex: 2
+      - equal:
+          path: spec.rules[0].host
+          value: outline.yourdomain.tld
+        documentIndex: 2
+
+  - it: should work with minimal configuration
+    set:
+      postgresql.enabled: false
+      redis.enabled: false
+      minio.enabled: false
+      ingress.enabled: false
+    asserts:
+      # Should only have Deployment and Service
+      - hasDocuments:
+          count: 2
+      
+      # Should not have database/redis/minio environment variables
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+        documentIndex: 0
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_URL
+        documentIndex: 0
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AWS_ACCESS_KEY_ID
+        documentIndex: 0

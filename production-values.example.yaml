@@ -1,0 +1,132 @@
+# Production Values for Outline Helm Chart
+# ========================================
+# Copy this file to production-values.yaml and customize for your environment
+# IMPORTANT: Create the required secrets before deploying!
+
+# Ingress configuration for production
+ingress:
+  enabled: true
+  className: nginx
+  host: outline.company.com
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+  tls:
+    enabled: true
+
+# Production secrets configuration
+secrets:
+  name: "outline-secrets"
+  # Ensure these keys exist in your Kubernetes secret:
+  # - SECRET_KEY (generated with: openssl rand -hex 32)
+  # - UTILS_SECRET (generated with: openssl rand -hex 32)
+  # - SLACK_CLIENT_SECRET (your Slack OAuth app secret)
+  # - SMTP_PASSWORD (your SMTP password)
+
+# Environment configuration
+env:
+  # Authentication (set the client IDs, secrets come from Kubernetes secret)
+  SLACK_CLIENT_ID: "your-slack-client-id"
+  
+  # Email configuration
+  SMTP_USERNAME: "outline@company.com"
+  SMTP_FROM_EMAIL: "outline@company.com"
+  
+  # Production settings
+  LOG_LEVEL: "info"
+  RATE_LIMITER_ENABLED: "true"
+  RATE_LIMITER_REQUESTS: "1000"
+  ENABLE_UPDATES: "false"  # Disable in production
+
+# PostgreSQL with production settings
+postgresql:
+  # Use existing secret for production (recommended)
+  existingSecret: "postgresql-credentials"
+  existingSecretPasswordKey: "postgresql-password"
+  existingSecretPostgresPasswordKey: "postgresql-postgres-password"
+  
+  # Production database settings
+  persistence:
+    enabled: true
+    storageClass: "fast-ssd"  # Use your production storage class
+    size: 20Gi
+  
+  # Resource limits for production
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+# Redis with production settings
+redis:
+  persistence:
+    enabled: true
+    storageClass: "fast-ssd"
+    size: 5Gi
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# MinIO with production settings
+minio:
+  # Use existing secret for production (recommended)
+  existingSecret: "minio-credentials"
+  existingSecretAccessKeyKey: "access-key"
+  existingSecretSecretKeyKey: "secret-key"
+  
+  # Production storage settings
+  persistence:
+    enabled: true
+    storageClass: "standard"  # Use your production storage class
+    size: 100Gi
+  
+  # MinIO ingress for direct access
+  ingress:
+    enabled: true
+    hostname: "outline-storage.company.com"
+    certManager: true
+    tls: true
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  
+  # Resource limits
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+# Outline application resources
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Multiple replicas for high availability
+replicas: 2
+
+# Production monitoring and health checks
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 30
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
