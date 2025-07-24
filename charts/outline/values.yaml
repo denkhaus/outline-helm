@@ -33,14 +33,10 @@ env:
   ENABLE_UPDATES: "true"
   LOG_LEVEL: "info"
 
-  # Core secrets (CHANGE THESE IN PRODUCTION!)
-  SECRET_KEY: "test-secret-key-change-in-production"
-  UTILS_SECRET: "test-utils-secret-change-in-production"
-
 # Required Kubernetes secret containing sensitive values
 # You MUST create this secret before installing the chart
 secrets:
-  name: ""  # Name of your existing Kubernetes secret (leave empty to use env vars)
+  name: "outline-secrets"  # Name of your existing Kubernetes secret
   secretKeyName: "SECRET_KEY"  # Key name in the secret for SECRET_KEY
   utilsSecretName: "UTILS_SECRET"  # Key name in the secret for UTILS_SECRET
 
@@ -91,14 +87,14 @@ postgresql:
   # 2. Superuser ("postgres") - Full admin privileges, for setup/maintenance
 
   # Option 1: Hardcoded passwords (NOT recommended for production)
-  postgresqlPassword: "vh4rf^q32BcvtFqFVjny4pnM"  # Password for "outline"
-  postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password
+  # postgresqlPassword: "vh4rf^q32BcvtFqFVjny4pnM"  # Password for "outline"
+  # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password
 
   # Option 2: Use existing secret for PostgreSQL credentials
   # Uncomment and configure the following to use existing secret:
-  # existingSecret: "postgresql-credentials"
-  # existingSecretPasswordKey: "postgresql-password"  # Key for "outline"
-  # existingSecretPostgresPasswordKey: "postgresql-postgres-password"
+  existingSecret: "postgresql-credentials"
+  existingSecretPasswordKey: "postgresql-password"  # Key for "outline"
+  existingSecretPostgresPasswordKey: "postgresql-postgres-password"
 
   persistence:
     enabled: true
@@ -119,16 +115,16 @@ minio:
   defaultBuckets: "ol-data"  # should not be "outline" because of issue #2068
 
   # Option 1: Hardcoded credentials (NOT recommended for production)
-  secretKey:
-    password: "Uk4LuwVFvRDiG6k4nYA5C^835V"  # MUST be replaced!
-  accessKey:
-    password: "zFPVNNK*QNp3^V4J38Gy76SehG"  # MUST be replaced!
+  # secretKey:
+  #   password: "Uk4LuwVFvRDiG6k4nYA5C^835V"  # MUST be replaced!
+  # accessKey:
+  #   password: "zFPVNNK*QNp3^V4J38Gy76SehG"  # MUST be replaced!
 
   # Option 2: Use existing secret for MinIO credentials (RECOMMENDED)
   # Uncomment and configure the following to use an existing secret:
-  # existingSecret: "minio-credentials"
-  # existingSecretAccessKeyKey: "access-key"
-  # existingSecretSecretKeyKey: "secret-key"
+  existingSecret: "minio-credentials"
+  existingSecretAccessKeyKey: "access-key"
+  existingSecretSecretKeyKey: "secret-key"
 
   persistence:
     enabled: true
