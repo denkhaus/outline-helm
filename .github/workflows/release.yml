@@ -29,30 +29,9 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Install chart-releaser
-        run: |
-          wget https://github.com/helm/chart-releaser/releases/download/v1.6.1/chart-releaser_1.6.1_linux_amd64.tar.gz
-          tar -xzf chart-releaser_1.6.1_linux_amd64.tar.gz
-          sudo mv cr /usr/local/bin/cr
-
-      - name: Package and release charts
-        run: |
-          # Create packages directory
-          mkdir -p .cr-release-packages
-          
-          # Package charts
-          for chart in charts/*; do
-            if [ -d "$chart" ]; then
-              helm package "$chart" --destination .cr-release-packages
-            fi
-          done
-          
-          # Upload chart packages to GitHub releases
-          cr upload -o denkhaus -r outline-helm -c $(git rev-parse HEAD) --skip-existing
-          
-          # Update index and push to gh-pages
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          cr index -o denkhaus -r outline-helm -c https://denkhaus.github.io/outline-helm --push
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.4.1
+        with:
+          charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
