@@ -88,7 +88,7 @@ postgresql:
 
   # Option 1: Hardcoded passwords (NOT recommended for production)
   # postgresqlPassword: "vh4rf^q32BcvtFqFVjny4pnM"  # Password for "outline"
-  # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password for "postgres"
+  # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password
 
   # Option 2: Use existing secret for PostgreSQL credentials
   # Uncomment and configure the following to use existing secret:
