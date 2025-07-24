@@ -39,6 +39,14 @@ if ! helm plugin list | grep -q unittest; then
     helm plugin install https://github.com/helm-unittest/helm-unittest
 fi
 
+print_status "INFO" "Updating Helm dependencies..."
+if helm dependency update; then
+    print_status "SUCCESS" "Dependencies updated"
+else
+    print_status "ERROR" "Failed to update dependencies"
+    exit 1
+fi
+
 print_status "INFO" "Running Helm lint..."
 if helm lint .; then
     print_status "SUCCESS" "Helm lint passed"
