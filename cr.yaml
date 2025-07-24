@@ -1,7 +1,2 @@
-# Configuration for chart-releaser
 owner: denkhaus
 git-repo: outline-helm
-charts-dir: charts
-skip-existing: true
-# Disable package signing to avoid cosign issues
-sign: false
