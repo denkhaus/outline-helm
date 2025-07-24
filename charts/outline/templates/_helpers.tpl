@@ -71,6 +71,7 @@ Core application environment variables
 Core secret environment variables (REQUIRED from Kubernetes secret)
 */}}
 {{- define "outline.coreSecretEnv" -}}
+{{- if .Values.secrets.name }}
 - name: SECRET_KEY
   valueFrom:
     secretKeyRef:
@@ -81,6 +82,7 @@ Core secret environment variables (REQUIRED from Kubernetes secret)
     secretKeyRef:
       name: {{ .Values.secrets.name }}
       key: {{ .Values.secrets.utilsSecretName }}
+{{- end }}
 {{- end }}
 
 {{/*

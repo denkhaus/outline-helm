@@ -2,16 +2,20 @@
 # Test values for chart-testing (CI)
 # This file provides test secrets for the chart installation test
 
+# Disable the main outline secrets requirement for testing
+secrets:
+  name: ""  # Disable existing secret requirement
+
 # Use hardcoded credentials for testing (not for production!)
 postgresql:
   enabled: true
   # Use hardcoded passwords for CI testing
   postgresqlPassword: "test-password-123"
   postgresqlPostgresPassword: "test-postgres-password-456"
-  # Comment out existing secret for testing
-  # existingSecret: "postgresql-credentials"
-  # existingSecretPasswordKey: "postgresql-password"
-  # existingSecretPostgresPasswordKey: "postgresql-postgres-password"
+  # Disable existing secret for testing
+  existingSecret: ""
+  existingSecretPasswordKey: ""
+  existingSecretPostgresPasswordKey: ""
 
 minio:
   enabled: true
@@ -20,10 +24,12 @@ minio:
     password: "test-access-key-123"
   secretKey:
     password: "test-secret-key-456"
-  # Comment out existing secret for testing
-  # existingSecret: "minio-credentials"
-  # existingSecretAccessKeyKey: "access-key"
-  # existingSecretSecretKeyKey: "secret-key"
+  # Disable existing secret for testing
+  existingSecret: ""
+  existingSecretAccessKeyKey: ""
+  existingSecretSecretKeyKey: ""
 
-# For the main outline secrets, we'll need to create a test secret
-# This will be handled by the chart-testing workflow
+# Add test environment variables that would normally come from secrets
+env:
+  SECRET_KEY: "test-secret-key-for-ci-only"
+  UTILS_SECRET: "test-utils-secret-for-ci-only"
