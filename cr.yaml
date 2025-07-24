@@ -4,4 +4,8 @@ charts-dir: charts
 skip-existing: true
 pages-branch: gh-pages
 pages-index-path: index.yaml
+<<<<<<< HEAD
 release-name-template: "v{{ .Version }}"
+=======
+release-name-template: "v{{ .Version }}"
+>>>>>>> origin/main
