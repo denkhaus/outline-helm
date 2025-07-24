@@ -1,3 +1,4 @@
+---
 name: outline
 image:
   repository: outlinewiki/outline
@@ -6,27 +7,28 @@ image:
 replicas: 1
 env:
   # Non-sensitive environment variables only
-  # Sensitive values (SLACK_CLIENT_SECRET, GOOGLE_CLIENT_SECRET, AZURE_CLIENT_SECRET, 
-  # DISCORD_CLIENT_SECRET, OIDC_CLIENT_SECRET, SMTP_PASSWORD, SECRET_KEY, UTILS_SECRET) 
+  # Sensitive values (SLACK_CLIENT_SECRET, GOOGLE_CLIENT_SECRET,
+  # AZURE_CLIENT_SECRET, DISCORD_CLIENT_SECRET, OIDC_CLIENT_SECRET,
+  # SMTP_PASSWORD, SECRET_KEY, UTILS_SECRET)
   # must be provided via the secrets configuration below
-  
+
   # Basic configuration
   DEFAULT_LANGUAGE: "en_US"
   WEB_CONCURRENCY: "1"
   FORCE_HTTPS: "true"
-  
+
   # Email configuration (non-sensitive)
   SMTP_FROM_EMAIL: "noreply@example.com"
-  
+
   # File storage
   FILE_STORAGE: "s3"  # Using minio S3-compatible storage
   FILE_STORAGE_UPLOAD_MAX_SIZE: "262144000"
-  
+
   # Rate limiting
   RATE_LIMITER_ENABLED: "true"
   RATE_LIMITER_REQUESTS: "1000"
   RATE_LIMITER_DURATION_WINDOW: "60"
-  
+
   # Features
   ENABLE_UPDATES: "true"
   LOG_LEVEL: "info"
@@ -34,33 +36,33 @@ env:
 # Required Kubernetes secret containing sensitive values
 # You MUST create this secret before installing the chart
 secrets:
-  name: "outline-secrets" # Name of your existing Kubernetes secret
-  secretKeyName: "SECRET_KEY" # Key name in the secret for SECRET_KEY
-  utilsSecretName: "UTILS_SECRET" # Key name in the secret for UTILS_SECRET
-  
+  name: "outline-secrets"  # Name of your existing Kubernetes secret
+  secretKeyName: "SECRET_KEY"  # Key name in the secret for SECRET_KEY
+  utilsSecretName: "UTILS_SECRET"  # Key name in the secret for UTILS_SECRET
+
   # Authentication secrets (at least one provider required)
-  slackClientSecretName: "SLACK_CLIENT_SECRET" # Slack OAuth secret
-  googleClientSecretName: "GOOGLE_CLIENT_SECRET" # Google OAuth secret  
-  azureClientSecretName: "AZURE_CLIENT_SECRET" # Azure/Microsoft secret
-  discordClientSecretName: "DISCORD_CLIENT_SECRET" # Discord OAuth secret
-  oidcClientSecretName: "OIDC_CLIENT_SECRET" # Generic OIDC secret
-  
+  slackClientSecretName: "SLACK_CLIENT_SECRET"  # Slack OAuth secret
+  googleClientSecretName: "GOOGLE_CLIENT_SECRET"  # Google OAuth secret
+  azureClientSecretName: "AZURE_CLIENT_SECRET"  # Azure/Microsoft secret
+  discordClientSecretName: "DISCORD_CLIENT_SECRET"  # Discord OAuth secret
+  oidcClientSecretName: "OIDC_CLIENT_SECRET"  # Generic OIDC secret
+
   # Email secret
-  smtpPasswordName: "SMTP_PASSWORD" # SMTP password
-  
+  smtpPasswordName: "SMTP_PASSWORD"  # SMTP password
+
   # Integration secrets (optional)
-  githubClientSecretName: "GITHUB_CLIENT_SECRET" # GitHub integration
-  githubWebhookSecretName: "GITHUB_WEBHOOK_SECRET" # GitHub webhook secret
-  githubAppPrivateKeyName: "GITHUB_APP_PRIVATE_KEY" # GitHub app private key
-  linearClientSecretName: "LINEAR_CLIENT_SECRET" # Linear integration
-  notionClientSecretName: "NOTION_CLIENT_SECRET" # Notion import
-  slackVerificationTokenName: "SLACK_VERIFICATION_TOKEN" # Slack integration token
+  githubClientSecretName: "GITHUB_CLIENT_SECRET"  # GitHub integration
+  githubWebhookSecretName: "GITHUB_WEBHOOK_SECRET"  # GitHub webhook secret
+  githubAppPrivateKeyName: "GITHUB_APP_PRIVATE_KEY"  # GitHub app private key
+  linearClientSecretName: "LINEAR_CLIENT_SECRET"  # Linear integration
+  notionClientSecretName: "NOTION_CLIENT_SECRET"  # Notion import
+  slackVerificationTokenName: "SLACK_VERIFICATION_TOKEN"  # Slack integration
 
 ingress:
   enabled: true
   className: nginx
   host: outline.yourdomain.tld
-  annotations: # set your custom ingress annotations here
+  annotations:  # set your custom ingress annotations here
     # cert-manager.io/cluster-issuer: "letsencrypt-staging"
   tls:
     enabled: false
@@ -79,21 +81,21 @@ postgresql:
   architecture: "standalone"
   postgresqlDatabase: "outline"
   postgresqlUsername: "outline"
-  
+
   # PostgreSQL uses TWO different users with different privilege levels:
   # 1. Application User ("outline") - Limited privileges, used by Outline app
-  # 2. Superuser ("postgres") - Full admin privileges, used for setup/maintenance
-  
+  # 2. Superuser ("postgres") - Full admin privileges, for setup/maintenance
+
   # Option 1: Hardcoded passwords (NOT recommended for production)
-  postgresqlPassword: "vh4rf^q32BcvtFqFVjny4pnM" # Password for "outline" user (app access)
-  postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd" # Password for "postgres" superuser (admin access)
-  
-  # Option 2: Use existing secret for PostgreSQL credentials (RECOMMENDED for production)
-  # Uncomment and configure the following to use an existing secret:
-  # existingSecret: "postgresql-credentials"
-  # existingSecretPasswordKey: "postgresql-password"        # Key for "outline" user password
-  # existingSecretPostgresPasswordKey: "postgresql-postgres-password"  # Key for "postgres" superuser password
-  
+  # postgresqlPassword: "vh4rf^q32BcvtFqFVjny4pnM"  # Password for "outline"
+  # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password
+
+  # Option 2: Use existing secret for PostgreSQL credentials
+  # Uncomment and configure the following to use existing secret:
+  existingSecret: "postgresql-credentials"
+  existingSecretPasswordKey: "postgresql-password"  # Key for "outline"
+  existingSecretPostgresPasswordKey: "postgresql-postgres-password"
+
   persistence:
     enabled: true
     storageClass: ""
@@ -110,20 +112,20 @@ minio:
     annotations:
       # cert-manager.io/cluster-issuer: "letsencrypt-staging"
   mode: "standalone"
-  defaultBuckets: "ol-data" # should not be "outline" because of https://github.com/outline/outline/issues/2068
-  
+  defaultBuckets: "ol-data"  # should not be "outline" because of issue #2068
+
   # Option 1: Hardcoded credentials (NOT recommended for production)
-  secretKey:
-    password: "Uk4LuwVFvRDiG6k4nYA5C^835V" # MUST be replaced with some custom generated secret! Don't use this in production
-  accessKey:
-    password: "zFPVNNK*QNp3^V4J38Gy76SehG" # MUST be replaced with some custom generated access_key! Don't use this in production
-  
-  # Option 2: Use existing secret for MinIO credentials (RECOMMENDED for production)
+  # secretKey:
+  #   password: "Uk4LuwVFvRDiG6k4nYA5C^835V"  # MUST be replaced!
+  # accessKey:
+  #   password: "zFPVNNK*QNp3^V4J38Gy76SehG"  # MUST be replaced!
+
+  # Option 2: Use existing secret for MinIO credentials (RECOMMENDED)
   # Uncomment and configure the following to use an existing secret:
-  # existingSecret: "minio-credentials"
-  # existingSecretAccessKeyKey: "access-key"
-  # existingSecretSecretKeyKey: "secret-key"
-  
+  existingSecret: "minio-credentials"
+  existingSecretAccessKeyKey: "access-key"
+  existingSecretSecretKeyKey: "secret-key"
+
   persistence:
     enabled: true
     storageClass: ""

@@ -71,6 +71,7 @@ Core application environment variables
 Core secret environment variables (REQUIRED from Kubernetes secret)
 */}}
 {{- define "outline.coreSecretEnv" -}}
+{{- if .Values.secrets.name }}
 - name: SECRET_KEY
   valueFrom:
     secretKeyRef:
@@ -82,16 +83,29 @@ Core secret environment variables (REQUIRED from Kubernetes secret)
       name: {{ .Values.secrets.name }}
       key: {{ .Values.secrets.utilsSecretName }}
 {{- end }}
+{{- end }}
 
 {{/*
 Database environment variables
 */}}
 {{- define "outline.databaseEnv" -}}
 {{- if .Values.postgresql.enabled }}
+{{- if .Values.postgresql.existingSecret }}
+- name: DATABASE_URL
+  value: "postgres://{{ .Values.postgresql.postgresqlUsername}}:$(POSTGRES_PASSWORD)@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}"
+- name: DATABASE_URL_TEST
+  value: "postgres://{{ .Values.postgresql.postgresqlUsername }}:$(POSTGRES_PASSWORD)@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}-test"
+- name: POSTGRES_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.postgresql.existingSecret }}
+      key: {{ .Values.postgresql.existingSecretPasswordKey }}
+{{- else }}
 - name: DATABASE_URL
   value: "postgres://{{ .Values.postgresql.postgresqlUsername}}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}"
 - name: DATABASE_URL_TEST
   value: "postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase }}-test"
+{{- end }}
 - name: PGSSLMODE
   value: "disable"
 {{- end }}
@@ -112,10 +126,23 @@ S3/Minio environment variables
 */}}
 {{- define "outline.s3Env" -}}
 {{- if .Values.minio.enabled }}
+{{- if .Values.minio.existingSecret }}
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.minio.existingSecret }}
+      key: {{ .Values.minio.existingSecretAccessKeyKey }}
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.minio.existingSecret }}
+      key: {{ .Values.minio.existingSecretSecretKeyKey }}
+{{- else }}
 - name: AWS_ACCESS_KEY_ID
   value: {{ .Values.minio.accessKey.password | quote }}
 - name: AWS_SECRET_ACCESS_KEY
   value: {{ .Values.minio.secretKey.password | quote }}
+{{- end }}
 - name: AWS_REGION
   value: "us-east-1"
 {{- if .Values.minio.ingress.tls }}
