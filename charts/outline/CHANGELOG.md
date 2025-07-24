@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.5] - 2024-07-24
+
+### 🔧 Changed
+- **Redis URL Construction**: Corrected logic for assembling `REDIS_URL` from `REDIS_HOST` to properly handle optional passwords via `secrets.enableRedisPassword`.
+
 ## [1.0.4] - 2024-07-24
 
 ### ✨ Added

@@ -51,6 +51,7 @@ secrets:
   smtpPasswordName: "SMTP_PASSWORD" # SMTP password
 
   redisPasswordName: "REDIS_PASSWORD" # Redis password
+  enableRedisPassword: false # Set to true to enable Redis password from secret
 
   # Integration secrets (optional)
   githubClientSecretName: "GITHUB_CLIENT_SECRET" # GitHub integration

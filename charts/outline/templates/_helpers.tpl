@@ -129,7 +129,7 @@ Redis environment variables
 {{- else if .Values.env.REDIS_HOST }}
 {{- $redisHost := .Values.env.REDIS_HOST }}
 {{- $redisPort := .Values.env.REDIS_PORT | default "6379" }}
-{{- if .Values.secrets.redisPasswordName }}
+{{- if .Values.secrets.enableRedisPassword }}
 - name: REDIS_URL
   value: "redis://$(REDIS_PASSWORD)@{{ $redisHost }}:{{ $redisPort }}"
 - name: REDIS_PASSWORD

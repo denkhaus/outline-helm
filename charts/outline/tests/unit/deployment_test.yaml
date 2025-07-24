@@ -175,6 +175,47 @@ tests:
                 name: outline-secrets
                 key: REDIS_PASSWORD
 
+  - it: should configure Redis URL from host and secret password when internal Redis is disabled and enableRedisPassword is true
+    set:
+      redis.enabled: false
+      env:
+        REDIS_HOST: "external-redis-host-with-password"
+      secrets:
+        enableRedisPassword: true
+        redisPasswordName: "REDIS_PASSWORD"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_URL
+            value: "redis://$(REDIS_PASSWORD)@external-redis-host-with-password:6379"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: REDIS_PASSWORD
+
+  - it: should configure Redis URL from host without password when internal Redis is disabled and enableRedisPassword is false
+    set:
+      redis.enabled: false
+      env:
+        REDIS_HOST: "external-redis-host-no-password"
+      secrets:
+        enableRedisPassword: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_URL
+            value: "redis://external-redis-host-no-password:6379"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_PASSWORD
+
   - it: should not load auth secrets when providers not configured
     asserts:
       - notContains:
