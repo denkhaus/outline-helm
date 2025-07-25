@@ -13,13 +13,27 @@ env:
   # must be provided via the secrets configuration below
 
   # Basic configuration
-  DEFAULT_LANGUAGE: "en_US"
-  WEB_CONCURRENCY: "1"
-  FORCE_HTTPS: "true"
+  # URL for the Outline application.
+  # If set, this value takes precedence over the URL derived from ingress settings.
+  URL: http://outline.yourdomain.tld
+
+  #COLLABORATION_URL=
+
+  # The REDIS_URL could be configured directly or gets assembled by the info provided in the redis section
+  # When configured directly these setting takes precedence
+  REDIS_URL: redis://redis-password-optional@redishost:6379/6
+
+  # The DATABASE_URL could be configured directly or gets assembled by the info provided in the postgres section
+  # When configured directly these setting takes precedence
+  DATABASE_URL: postgres://postgres-user:postgres-password-optional@postgres-host:5432/postgres-database
+  DATABASE_URL_TEST: postgres://postgres-user:postgres-password-optional@postgres-host:5432/postgres-database-test
 
   # Email configuration (non-sensitive)
   SMTP_FROM_EMAIL: "noreply@example.com"
-  URL: http://outline.yourdomain.tld
+  SMTP_REPLY_EMAIL: "christoph.nagler@musiktheater-im-revier.de"
+  SMTP_PORT: 587
+  SMTP_SECURE: true
+
   # File storage
   FILE_STORAGE: "s3" # Using minio S3-compatible storage
   FILE_STORAGE_UPLOAD_MAX_SIZE: "262144000"
@@ -32,34 +46,43 @@ env:
   # Features
   ENABLE_UPDATES: "true"
   LOG_LEVEL: "info"
+  DEFAULT_LANGUAGE: "en_US"
+  WEB_CONCURRENCY: "1"
+  FORCE_HTTPS: "true"
+  PGSSLMODE: disable
 
 # Required Kubernetes secret containing sensitive values
 # You MUST create this secret before installing the chart
 secrets:
   name: "outline-secrets" # Name of your existing Kubernetes secret
-  secretKeyName: "SECRET_KEY" # Key name in the secret for SECRET_KEY
-  utilsSecretName: "UTILS_SECRET" # Key name in the secret for UTILS_SECRET
+
+  # SECRET_KEY is mandatory and must be created with `openssl rand -hex 32`
+  secretKeySecretKeyName: "SECRET_KEY" # Key name in the secret for SECRET_KEY
+  # UTILS_SECRET is mandatory and must be created with `openssl rand -hex 32`
+  utilsSecretSecretKeyName: "UTILS_SECRET" # Key name in the secret for UTILS_SECRET
 
   # Authentication secrets (at least one provider required)
-  slackClientSecretName: "SLACK_CLIENT_SECRET" # Slack OAuth secret
-  googleClientSecretName: "GOOGLE_CLIENT_SECRET" # Google OAuth secret
-  azureClientSecretName: "AZURE_CLIENT_SECRET" # Azure/Microsoft secret
-  discordClientSecretName: "DISCORD_CLIENT_SECRET" # Discord OAuth secret
-  oidcClientSecretName: "OIDC_CLIENT_SECRET" # Generic OIDC secret
+  # Note: Provider secret Keys get only injected if the respective *_CLIENT_ID for the Provider is defined in env section
+
+  slackClientSecretSecretKeyName: "SLACK_CLIENT_SECRET" # Slack OAuth secret
+  googleClientSecretSecretKeyName: "GOOGLE_CLIENT_SECRET" # Google OAuth secret
+  azureClientSecretSecretKeyName: "AZURE_CLIENT_SECRET" # Azure/Microsoft secret
+  discordClientSecretSecretKeyName: "DISCORD_CLIENT_SECRET" # Discord OAuth secret
+  oidcClientSecretSecretKeyName: "OIDC_CLIENT_SECRET" # Generic OIDC secret
 
   # Email secret
-  smtpPasswordName: "SMTP_PASSWORD" # SMTP password
+  smtpPasswordSecretKeyName: "SMTP_PASSWORD" # SMTP password
 
-  redisPasswordName: "REDIS_PASSWORD" # Redis password
-  enableRedisPassword: false # Set to true to enable Redis password from secret
+  # Redis secret
+  redisPasswordSecretKeyName: "REDIS_PASSWORD" # Key name in the secret for the Redis password
 
   # Integration secrets (optional)
-  githubClientSecretName: "GITHUB_CLIENT_SECRET" # GitHub integration
-  githubWebhookSecretName: "GITHUB_WEBHOOK_SECRET" # GitHub webhook secret
-  githubAppPrivateKeyName: "GITHUB_APP_PRIVATE_KEY" # GitHub app private key
-  linearClientSecretName: "LINEAR_CLIENT_SECRET" # Linear integration
-  notionClientSecretName: "NOTION_CLIENT_SECRET" # Notion import
-  slackVerificationTokenName: "SLACK_VERIFICATION_TOKEN" # Slack integration
+  githubClientSecretSecretKeyName: "GITHUB_CLIENT_SECRET" # GitHub integration
+  githubWebhookSecretSecretKeyName: "GITHUB_WEBHOOK_SECRET" # GitHub webhook secret
+  githubAppPrivateKeySecretKeyName: "GITHUB_APP_PRIVATE_KEY" # GitHub app private key
+  linearClientSecretSecretKeyName: "LINEAR_CLIENT_SECRET" # Linear integration
+  notionClientSecretSecretKeyName: "NOTION_CLIENT_SECRET" # Notion import
+  slackVerificationTokenSecretKeyName: "SLACK_VERIFICATION_TOKEN" # Slack integration
 
 ingress:
   enabled: true
@@ -94,10 +117,10 @@ postgresql:
   # postgresqlPostgresPassword: "Ma#wXFMz6jFqXUr^qP&K66XQbd"  # Password
 
   # Option 2: Use existing secret for PostgreSQL credentials
-  # Uncomment and configure the following to use existing secret:
-  existingSecret: "postgresql-credentials"
-  existingSecretPasswordKey: "postgresql-password" # Key for "outline"
-  existingSecretPostgresPasswordKey: "postgresql-postgres-password"
+  # Configure the following to use existing secret:
+  existingSecret: "outline-secrets"
+  existingPasswordSecretKeyName: "POSTGRES_PASSWORD" # Key for "outline" password in existingSecret
+  existingPostgresPasswordSecretKeyName: "POSTGRES_ADMIN_PASSWORD" # Key for "postgres" password in existingSecret
 
   persistence:
     enabled: true
@@ -124,10 +147,10 @@ minio:
   #   password: "zFPVNNK*QNp3^V4J38Gy76SehG"  # MUST be replaced!
 
   # Option 2: Use existing secret for MinIO credentials (RECOMMENDED)
-  # Uncomment and configure the following to use an existing secret:
-  existingSecret: "minio-credentials"
-  existingSecretAccessKeyKey: "access-key"
-  existingSecretSecretKeyKey: "secret-key"
+  # Configure the following to use an existing secret:
+  existingSecret: "outline-secrets"
+  existingAccessKeySecretKeyName: "MINIO_ACCESS_KEY" # Key for access key in existingSecret
+  existingSecretSecretKeyName: "MINIO_SECRET_KEY" # Key for secret key in existingSecret
 
   persistence:
     enabled: true

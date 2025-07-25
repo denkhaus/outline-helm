@@ -19,3 +19,6 @@ Thumbs.db
 # Logs
 *.log
 GEMINI.md
+.agent.md
+commands
+.agent-os
