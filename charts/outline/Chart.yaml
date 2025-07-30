@@ -1,7 +1,7 @@
 apiVersion: v2
 name: outline
 description: Secure Helm chart for Outline wiki with mandatory Kubernetes secrets
-version: 1.0.5
+version: 1.0.6
 appVersion: 0.85.1
 home: https://github.com/denkhaus/outline-helm
 icon: https://raw.githubusercontent.com/outline/outline/main/public/images/icon-512.png
@@ -25,16 +25,16 @@ maintainers:
 dependencies:
   - name: postgresql
     repository: oci://registry-1.docker.io/bitnamicharts
-    version: 16.3.0
+    version: 16.7.21
     alias: postgresql
     condition: postgresql.enabled
   - name: redis
     repository: oci://registry-1.docker.io/bitnamicharts
-    version: 20.5.0
+    version: 21.2.13
     alias: redis
     condition: redis.enabled
   - name: minio
     repository: oci://registry-1.docker.io/bitnamicharts
-    version: 14.8.6
+    version: 17.0.16
     alias: minio
     condition: minio.enabled

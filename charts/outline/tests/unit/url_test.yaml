@@ -1,0 +1,59 @@
+
+suite: test URL environment variable
+templates:
+  - outline.yaml
+tests:
+  - it: should set URL to https when ingress TLS is enabled and env.URL is not set
+    documentSelector:
+      path: kind
+      value: Deployment
+    set:
+      ingress:
+        enabled: true
+        host: "test.example.com"
+        tls:
+          enabled: true
+      env:
+        # Ensure env.URL is not set for this test
+        URL: ""
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: URL
+            value: "https://test.example.com"
+
+  - it: should set URL to http when ingress TLS is disabled and env.URL is not set
+    documentSelector:
+      path: kind
+      value: Deployment
+    set:
+      ingress:
+        enabled: true
+        host: "test.example.com"
+        tls:
+          enabled: false
+      env:
+        # Ensure env.URL is not set for this test
+        URL: ""
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: URL
+            value: "http://test.example.com"
+
+  - it: should use env.URL when explicitly set, overriding ingress settings
+    set:
+      ingress:
+        enabled: true
+        host: "test.example.com"
+        tls:
+          enabled: true # Even if TLS is enabled, env.URL should take precedence
+      env:
+        URL: "https://custom.url.com"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: URL
