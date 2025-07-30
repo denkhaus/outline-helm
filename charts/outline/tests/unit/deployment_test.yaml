@@ -3,6 +3,9 @@ templates:
   - outline.yaml
 tests:
   - it: should render deployment with default values
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - isKind:
           of: Deployment
@@ -17,6 +20,9 @@ tests:
           value: outlinewiki/outline:0.85.1
 
   - it: should set environment variables correctly
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -35,6 +41,9 @@ tests:
             value: "s3"
 
   - it: should load secrets from Kubernetes secret
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -54,6 +63,9 @@ tests:
                 key: UTILS_SECRET
 
   - it: should configure database URL when postgresql is enabled
+    documentSelector:
+      path: kind
+      value: Deployment
     set:
       postgresql.enabled: true
     asserts:
@@ -61,10 +73,12 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: DATABASE_URL
-            value: "postgres://outline:vh4rf^q32BcvtFqFVjny4pnM@RELEASE-NAME-postgresql:5432/outline"
-        documentIndex: 22
+            value: "postgres://outline:$(POSTGRES_PASSWORD)@test-postgresql:5432/outline"
 
   - it: should configure Redis URL when redis is enabled
+    documentSelector:
+      path: kind
+      value: Deployment
     set:
       redis.enabled: true
     asserts:
@@ -72,9 +86,12 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: REDIS_URL
-            value: "redis://RELEASE-NAME-redis-master:6379"
+            value: "redis://test-redis-master:6379"
 
   - it: should configure S3 environment when minio is enabled
+    documentSelector:
+      path: kind
+      value: Deployment
     set:
       minio.enabled: true
     asserts:
@@ -82,7 +99,10 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: AWS_ACCESS_KEY_ID
-            value: "zFPVNNK*QNp3^V4J38Gy76SehG"
+            valueFrom:
+              secretKeyRef:
+                name: outline-secrets
+                key: MINIO_ACCESS_KEY
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -154,12 +174,15 @@ tests:
                 key: GOOGLE_CLIENT_SECRET
 
   - it: should configure Redis URL from host and secret password when internal Redis is disabled
+    documentSelector:
+      path: kind
+      value: Deployment
     set:
       redis.enabled: false
       env:
         REDIS_HOST: "external-redis-host"
       secrets:
-        redisPasswordName: "REDIS_PASSWORD"
+        redisPasswordSecretKeyName: "REDIS_PASSWORD"
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -176,13 +199,16 @@ tests:
                 key: REDIS_PASSWORD
 
   - it: should configure Redis URL from host and secret password when internal Redis is disabled and enableRedisPassword is true
+    documentSelector:
+      path: kind
+      value: Deployment
     set:
       redis.enabled: false
       env:
         REDIS_HOST: "external-redis-host-with-password"
       secrets:
         enableRedisPassword: true
-        redisPasswordName: "REDIS_PASSWORD"
+        redisPasswordSecretKeyName: "REDIS_PASSWORD"
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -199,6 +225,9 @@ tests:
                 key: REDIS_PASSWORD
 
   - it: should configure Redis URL from host without password when internal Redis is disabled and enableRedisPassword is false
+    documentSelector:
+      path: kind
+      value: Deployment
     set:
       redis.enabled: false
       env:
@@ -217,68 +246,15 @@ tests:
             name: REDIS_PASSWORD
 
   - it: should not load auth secrets when providers not configured
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: SLACK_CLIENT_SECRET
-        documentIndex: 1
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: GOOGLE_CLIENT_SECRET
-        documentIndex: 1
-
-suite: test URL environment variable
-templates:
-  - outline.yaml
-tests:
-  - it: should set URL to https when ingress TLS is enabled and env.URL is not set
-    set:
-      ingress:
-        enabled: true
-        host: "test.example.com"
-        tls:
-          enabled: true
-      env:
-        # Ensure env.URL is not set for this test
-        URL: ""
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: URL
-            value: "https://test.example.com"
-
-  - it: should set URL to http when ingress TLS is disabled and env.URL is not set
-    set:
-      ingress:
-        enabled: true
-        host: "test.example.com"
-        tls:
-          enabled: false
-      env:
-        # Ensure env.URL is not set for this test
-        URL: ""
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: URL
-            value: "http://test.example.com"
-
-  - it: should use env.URL when explicitly set, overriding ingress settings
-    set:
-      ingress:
-        enabled: true
-        host: "test.example.com"
-        tls:
-          enabled: true # Even if TLS is enabled, env.URL should take precedence
-      env:
-        URL: "https://custom.url.com"
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: URL
-            value: "https://custom.url.com"

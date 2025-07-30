@@ -79,12 +79,12 @@ Core secret environment variables (REQUIRED from Kubernetes secret)
   valueFrom:
     secretKeyRef:
       name: {{ .Values.secrets.name }}
-      key: {{ .Values.secrets.secretKeyName }}
+      key: {{ .Values.secrets.secretKeySecretKeyName }}
 - name: UTILS_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ .Values.secrets.name }}
-      key: {{ .Values.secrets.utilsSecretName }}
+      key: {{ .Values.secrets.utilsSecretSecretKeyName }}
 {{- end }}
 {{- end }}
 
@@ -105,7 +105,7 @@ Database environment variables
   valueFrom:
     secretKeyRef:
       name: {{ .Values.postgresql.existingSecret }}
-      key: {{ .Values.postgresql.existingSecretPasswordKey }}
+      key: {{ .Values.postgresql.existingPasswordSecretKeyName }}
 {{- else }}
 - name: DATABASE_URL
   value: "postgres://{{ $dbUser }}:{{ .Values.postgresql.postgresqlPassword }}@{{ $dbHost }}:{{ $dbPort }}/{{ $dbName }}"
@@ -154,12 +154,12 @@ S3/Minio environment variables
   valueFrom:
     secretKeyRef:
       name: {{ .Values.minio.existingSecret }}
-      key: {{ .Values.minio.existingSecretAccessKeyKey }}
+      key: {{ .Values.minio.existingAccessKeySecretKeyName }}
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .Values.minio.existingSecret }}
-      key: {{ .Values.minio.existingSecretSecretKeyKey }}
+      key: {{ .Values.minio.existingSecretSecretKeyName }}
 {{- else }}
 - name: AWS_ACCESS_KEY_ID
   value: {{ .Values.minio.accessKey.password | quote }}

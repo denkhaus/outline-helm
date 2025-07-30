@@ -134,8 +134,8 @@ minio:
     enabled: true
     hostname: data.outline.yourdomain.tld
     certManager: false
-    tls: false
-    annotations:
+    # Remove tls configuration to use MinIO chart defaults
+    annotations: {}
       # cert-manager.io/cluster-issuer: "letsencrypt-staging"
   mode: "standalone"
   defaultBuckets: "ol-data" # should not be "outline" because of issue #2068
